@@ -7,10 +7,22 @@ A page is a `WorkspacePage` definition. It names the page, gives it a side bar i
 Every page has a center panel. Add a left panel for navigation within the page, such as a list of saved items, and a right panel for a tool that works alongside the page, such as an assistant.
 
 ```tsx
+import type { WorkspacePage } from "@saas-template/workspace";
+
+function ReportList() {
+  return <p>Saved reports</p>;
+}
+function OpenReportName() {
+  return "Untitled report";
+}
+function ReportView() {
+  return <p>Choose a report</p>;
+}
+
 const reportsPage: WorkspacePage = {
   id: "reports",
   label: "Reports",
-  icon: <AssessmentOutlined />,
+  icon: <span aria-hidden="true">R</span>,
   panels: {
     left: { title: "Saved reports", content: ReportList },
     center: { title: OpenReportName, content: ReportView },
@@ -26,7 +38,7 @@ Side panels have fixed size limits. The left panel opens at 240 pixels and resiz
 
 ## Write panel content
 
-Panel content components take no props. They read what they need from the app's stores, context, or router hooks, the same way any component in the app would.
+Define panel content and title components outside the rendering component so their identities stay stable. Creating a new component function during each render causes React to remount it. Panel content components take no props. They read what they need from the app's stores, context, or router hooks, the same way any component in the app would.
 
 Render text through MUI `Typography`. The workspace theme trims `Typography` text so it centers correctly; [Styling and text](styling.md) explains why.
 
@@ -44,43 +56,58 @@ function ProjectList() {
 }
 ```
 
-The center `title` is a component rather than a string, so it can show live state:
-
-```tsx
-function OpenReportName() {
-  const name = useReportStore((state) => state.openReport?.name);
-  return name ?? "Untitled report";
-}
-```
+The center `title` is a component rather than a string, so it can read the same live state as its content.
 
 ## Share state between panels
 
-A page's panels render in separate parts of the frame and receive no props. Keep state they share, such as the open report, in a store or a context provider above `Workspace`. With Zustand:
+A page's panels render in separate parts of the frame and receive no props. Keep state they share, such as the open report, in a store or a context provider above `Workspace`. For example, use React context above the frame:
 
 ```tsx
-import { create } from "zustand";
+import { createContext, useContext, useState } from "react";
+import { Workspace, type WorkspacePages } from "@saas-template/workspace";
 
-type Report = { id: string; name: string };
-type ReportState = {
-  openReport: Report | null;
-  setOpenReport: (report: Report) => void;
-};
+type ReportState = { name: string | null; open: (name: string) => void };
+const ReportContext = createContext<ReportState | null>(null);
 
-const useReportStore = create<ReportState>((set) => ({
-  openReport: null,
-  setOpenReport: (report) => set({ openReport: report }),
-}));
+function useReport() {
+  const report = useContext(ReportContext);
+  if (!report) throw new Error("Report components require ReportContext");
+  return report;
+}
 
 function ReportList() {
-  const setOpenReport = useReportStore((state) => state.setOpenReport);
-  return (
-    <button onClick={() => setOpenReport({ id: "1", name: "First report" })}>Open report</button>
-  );
+  const { open } = useReport();
+  return <button onClick={() => open("First report")}>Open report</button>;
+}
+
+function OpenReportName() {
+  return useReport().name ?? "Untitled report";
 }
 
 function ReportView() {
-  const report = useReportStore((state) => state.openReport);
-  return <p>{report?.name ?? "Choose a report"}</p>;
+  const { name } = useReport();
+  return <p>{name ?? "Choose a report"}</p>;
+}
+
+const pages: WorkspacePages = [
+  {
+    id: "reports",
+    label: "Reports",
+    icon: <span aria-hidden="true">R</span>,
+    panels: {
+      left: { title: "Saved reports", content: ReportList },
+      center: { title: OpenReportName, content: ReportView },
+    },
+  },
+];
+
+export function App() {
+  const [name, open] = useState<string | null>(null);
+  return (
+    <ReportContext.Provider value={{ name, open }}>
+      <Workspace pages={pages} pageId="reports" />
+    </ReportContext.Provider>
+  );
 }
 ```
 
@@ -88,14 +115,7 @@ function ReportView() {
 
 Each side of the frame stays mounted while the user moves between pages. When two pages supply the same content component for a side, React keeps that component mounted, so its state, such as an unsent message, carries from one page to the other. Pass the same component, not a new wrapper, to get this behavior. Moving through a page with no panel on that side unmounts the content, so its state resets.
 
-```tsx
-const assistant = { title: "Assistant", content: AssistantPanel };
-
-const pages: WorkspacePages = [
-  { id: "reports", label: "Reports", icon, panels: { center, right: assistant } },
-  { id: "data", label: "Data", icon, panels: { center: dataCenter, right: assistant } },
-];
-```
+Use one stable `AssistantPanel` component in both pages' `right.content` fields. The panel's title can differ without changing that component's identity. Center content follows React's component identity rules too; there is no separate per-page state cache.
 
 ## Order pages in the side bar
 

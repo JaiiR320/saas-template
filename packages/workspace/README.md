@@ -4,13 +4,12 @@ A full-window app frame for React. The workspace draws a side bar of pages, resi
 
 ```tsx
 import { Workspace, type WorkspacePages } from "@saas-template/workspace";
-import HomeOutlined from "@mui/icons-material/HomeOutlined";
 
 const pages: WorkspacePages = [
   {
     id: "home",
     label: "Home",
-    icon: <HomeOutlined />,
+    icon: <span aria-hidden="true">H</span>,
     panels: { center: { content: () => <p>Hello</p> } },
   },
 ];
@@ -20,7 +19,7 @@ export function App() {
 }
 ```
 
-The package is private to this repository and is consumed from source. It needs React 19.2 or newer, MUI 7, and Emotion in the app that renders it.
+The package is private to this repository and is consumed from source. It needs React and React DOM compatible with `^19.2.0`, MUI compatible with `^7.0.0`, and Emotion React and Styled compatible with `^11.0.0` in the app that renders it.
 
 ## Documentation
 

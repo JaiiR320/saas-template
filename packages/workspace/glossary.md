@@ -64,7 +64,7 @@ Only the panel toggle animates a side panel. Changing pages swaps panels instant
 
 ### Side panel state
 
-Whether each side panel is collapsed, and its width, held by `useSidePanel` in the workspace. It belongs to the frame rather than to any page, so it carries across pages: a panel collapsed or resized on one page stays that way on the next page that has it.
+Whether each side panel is collapsed, and its width. `Workspace` owns visibility, and each persistent side-panel slot owns width. This state belongs to the frame rather than to any page, so it carries across pages: a panel collapsed or resized on one page stays that way on the next page that has it. Remounting the workspace restores its initial visibility and widths.
 
 ### Panel toggle
 
@@ -100,4 +100,4 @@ The string that names a page, usually also its URL segment, so keep IDs stable, 
 
 ### Page link
 
-A side bar entry for a page: a real `<a href>` built by `getPageHref`, which defaults to `/${pageId}`. A plain click calls the shell's `navigate` with that URL, and hovering or focusing calls `prefetch`. Clicks with a modifier key, which open a new tab or window, are left to the browser, as are all clicks when the shell passes no `navigate`. The workspace never changes the URL itself; the shell's router does, then passes the new `pageId`. The [routing guide](docs/02-guides/routing.md) shows Next.js and TanStack Router setups.
+A side bar entry for a page: a real `<a href>` built by `getPageHref`, which defaults to `/${pageId}`. A plain click calls the shell's `navigate` with that URL, and hovering or focusing calls `prefetch`. Clicks with a modifier key, which open a new tab or window, are left to the browser, as are clicks on other pages when the shell passes no `navigate`. A plain click on the current page is prevented even without `navigate`. The workspace never changes the URL itself; the shell's router does, then passes the new `pageId`. The [routing guide](docs/02-guides/routing.md) explains the router adapter contract.

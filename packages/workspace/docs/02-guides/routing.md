@@ -9,69 +9,40 @@ The app's router owns the URL. The workspace reads the current page from `pageId
 | `navigate`    | Client-side navigation to a URL from `getPageHref`.                             |
 | `prefetch`    | Preloads a page's URL when its link is hovered or focused.                      |
 
-Without `navigate`, links load their URL normally. Clicks with a modifier key, which open a new tab or window, always go to the browser. A plain left click on the current page's link does nothing.
+Without `navigate`, links to other pages load their URL normally. Clicks with a modifier key, which open a new tab or window, always go to the browser. A plain left click on the current page's link does nothing.
 
 Render the workspace where it stays mounted as the page changes, usually a layout. Panel widths and collapsed sides live in the workspace, so remounting it on every page change resets them.
 
-## Next.js App Router
+## Connect a router
 
-Render the workspace from a client component inside a layout, and read the page from the segment below that layout with `useSelectedLayoutSegment`. Define `pages` in a client module as well: page definitions contain components, which a Server Component cannot pass to a Client Component.
+Keep the page definitions in a module used by the app, then adapt the router's current page and navigation methods to the workspace props. This adapter is independent of a router library:
 
 ```tsx
-// app/(workspace)/WorkspaceShell.tsx
-"use client";
+import { Workspace, type WorkspacePages } from "@saas-template/workspace";
 
-import { Workspace } from "@saas-template/workspace";
-import { useRouter, useSelectedLayoutSegment } from "next/navigation";
-import { pages } from "./pages";
+type RouterState = {
+  page: string | null;
+  go: (options: { to: string }) => void;
+};
 
-export function WorkspaceShell() {
-  const router = useRouter();
-  const segment = useSelectedLayoutSegment();
+export function RouterWorkspace({ pages, router }: { pages: WorkspacePages; router: RouterState }) {
   return (
     <Workspace
       pages={pages}
-      pageId={segment ?? undefined}
-      navigate={(href) => router.push(href)}
-      prefetch={(href) => router.prefetch(href)}
+      pageId={router.page ?? undefined}
+      navigate={(href) => router.go({ to: href })}
     />
   );
 }
 ```
 
-Render `<WorkspaceShell />` from `app/(workspace)/layout.tsx`. Give each page a route so its URL resolves, such as `app/(workspace)/[page]/page.tsx` returning `null`. Wrap the app in MUI's `AppRouterCacheProvider` as for any MUI app, and add `@saas-template/workspace` to `transpilePackages`.
+Pass the router's page segment as `pageId`, converting `null` to `undefined` if necessary. Wrap its navigation method in `(href) => ...` when its signature differs. Do the same for preloading, or omit `prefetch` if the router does not support it. Register routes for each generated URL, and arrange for direct requests and refreshes to resolve to the app.
 
-## TanStack Router
-
-Read the page from a route param and pass the router's `navigate` and `preloadRoute`:
-
-```tsx
-// src/routes/$page.tsx
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Workspace } from "@saas-template/workspace";
-import { pages } from "../pages";
-
-export const Route = createFileRoute("/$page")({ component: WorkspaceRoute });
-
-function WorkspaceRoute() {
-  const router = useRouter();
-  const { page } = Route.useParams();
-  return (
-    <Workspace
-      pages={pages}
-      pageId={page}
-      navigate={(href) => router.navigate({ to: href })}
-      prefetch={(href) => router.preloadRoute({ to: href })}
-    />
-  );
-}
-```
-
-TanStack Router keeps the route component mounted when only its param changes, so moving between pages keeps the workspace's panel state.
+The workspace does not subscribe to the router. Calling `navigate` must eventually cause the app to pass the new `pageId`. In apps with server components, define the page components and their page list on the client side because these definitions contain functions.
 
 ## Plain browser history
 
-Apps without a router can read the first path segment with `useSyncExternalStore` and navigate with `history.pushState`. [Getting started](../01-gettingStarted.md#connect-the-url) shows the complete version, which `apps/web` also uses.
+Apps without a router can read the first path segment with `useSyncExternalStore` and navigate with `history.pushState`. [Getting started](../01-gettingStarted.md#connect-the-url) shows a browser-only version.
 
 ## Under a base path
 

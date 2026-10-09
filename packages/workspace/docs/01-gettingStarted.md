@@ -2,9 +2,9 @@
 
 This tutorial builds a small app with two pages: a projects page with a project list on the left and an assistant on the right, and a settings page with only a center panel. It ends by connecting the side bar to the URL.
 
-## Install
+## Add the app dependencies
 
-Add the workspace and its peer dependencies to the app. Inside this repository, use the workspace protocol:
+This private package exports TypeScript source through its only entry point. Add it and its peer dependencies to a sibling app with the workspace protocol. This tutorial also uses the optional MUI icons package:
 
 ```json
 {
@@ -20,7 +20,7 @@ Add the workspace and its peer dependencies to the app. Inside this repository, 
 }
 ```
 
-The workspace exports TypeScript source, so the app's bundler compiles it. Vite does this without configuration. In Next.js, add `@saas-template/workspace` to `transpilePackages`.
+The app must compile the package's TypeScript and JSX. Its React entry point must mount `App`; the workspace does not create a React root.
 
 ## Render a first page
 
@@ -119,7 +119,7 @@ Moving between pages swaps the panels instantly. Panel widths and collapsed side
 
 ## Connect the URL
 
-The side bar renders each page as a link to `/<page id>`. With a fixed `pageId`, clicking a link loads that URL, but the workspace keeps showing the projects page. Read the page from the URL and pass a `navigate` function so links change pages without reloading:
+The side bar renders each page as a link to `/<page id>`. With a fixed `pageId`, links request their URLs through the browser, but the component always selects the projects page when rendered. Read the page from the URL and pass a `navigate` function so links change pages without reloading:
 
 ```tsx
 import { Workspace } from "@saas-template/workspace";
@@ -146,7 +146,7 @@ export function App() {
 }
 ```
 
-`/projects` and `/settings` now show their pages, and back and forward work. The root path and unknown paths show the first page. Apps with a router pass its values instead; [Routing](02-guides/routing.md) shows Next.js and TanStack Router.
+`/projects` and `/settings` now show their pages, and back and forward work. The root path and unknown paths show the first page. This browser-only example needs a server that serves the app at both paths, including on refresh. Apps with a router pass its current page and callbacks instead; see [Routing](02-guides/routing.md).
 
 ## Next steps
 
