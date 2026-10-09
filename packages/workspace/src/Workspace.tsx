@@ -54,8 +54,8 @@ export function Workspace({
   sideBarFooter,
 }: WorkspaceProps) {
   const page = pages.find((candidate) => candidate.id === pageId) ?? pages[0];
-  const left = useSidePanel("left", page.id);
-  const right = useSidePanel("right", page.id);
+  const left = useSidePanel(page.id);
+  const right = useSidePanel(page.id);
   const { center, left: leftPanel, right: rightPanel } = page.panels;
   const Center = center.content;
   const Title = center.title;

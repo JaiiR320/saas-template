@@ -1,13 +1,6 @@
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
-import type { Side } from "../types";
 import { theme } from "../theme";
-
-/** Width limits for each side panel. */
-export const sidePanelSizes = {
-  left: { defaultWidth: 240, minWidth: 180, maxWidth: 480 },
-  right: { defaultWidth: 360, minWidth: 280, maxWidth: 720 },
-} satisfies Record<Side, { defaultWidth: number; minWidth: number; maxWidth: number }>;
 
 export type SidePanelState = {
   open: boolean;
@@ -19,16 +12,13 @@ export type SidePanelState = {
    */
   animating: boolean;
   endAnimation: () => void;
-  width: number;
-  setWidth: (width: number) => void;
 };
 
-/** Visibility and width for one side of the frame. They outlive pages, so they carry across them. */
-export function useSidePanel(side: Side, pageId: string): SidePanelState {
+/** Visibility for one side of the frame. It outlives pages, so it carries across them. */
+export function useSidePanel(pageId: string): SidePanelState {
   const [open, setOpen] = useState(true);
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)", { noSsr: true });
   const [animation, setAnimation] = useState({ pageId, active: false });
-  const [width, setWidth] = useState(sidePanelSizes[side].defaultWidth);
 
   // Invalidate the request before rendering a different page. Remember the new page
   // even when returning quickly, so an earlier request cannot become active again.
@@ -55,7 +45,5 @@ export function useSidePanel(side: Side, pageId: string): SidePanelState {
     },
     animating,
     endAnimation: () => setAnimation((current) => ({ ...current, active: false })),
-    width,
-    setWidth,
   };
 }
