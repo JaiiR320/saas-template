@@ -4,11 +4,11 @@ import {
   type PointerEvent,
   type ReactNode,
   type RefObject,
-  type TransitionEvent,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { useTransitionEnabled } from "../motion/useTransitionEnabled";
 
 type ResizablePanelProps = {
   id: string;
@@ -18,10 +18,8 @@ type ResizablePanelProps = {
   /** Owned by the caller so the width can outlive this panel, such as across page changes. */
   width: number;
   onWidthChange: (width: number) => void;
-  /** Animate the next open or close. When false, the panel opens and closes instantly. */
+  /** Allow open/close transitions. Width changes and active dragging remain instant. */
   animate: boolean;
-  /** Called when an open or close animation finishes or is interrupted. */
-  onAnimationEnd: () => void;
   /** Restored by double-clicking the handle. */
   defaultWidth: number;
   minWidth: number;
@@ -70,7 +68,6 @@ export function ResizablePanel({
   width,
   onWidthChange,
   animate,
-  onAnimationEnd,
   defaultWidth,
   minWidth,
   maxWidth,
@@ -78,6 +75,7 @@ export function ResizablePanel({
   children,
 }: ResizablePanelProps) {
   const [resizing, setResizing] = useState(false);
+  const widthTransitionEnabled = useTransitionEnabled(width);
   const drag = useRef<Drag | null>(null);
   // Dragging toward the workspace center widens the panel.
   const direction = side === "left" ? 1 : -1;
@@ -168,21 +166,11 @@ export function ResizablePanel({
 
   const panelWidth = clamp(width);
 
-  // Ignore transitions from the contents and the handle, and the visibility transition.
-  const endWidthAnimation = (event: TransitionEvent<HTMLElement>) => {
-    // Only completion settles the request. Cancellation may belong to an older
-    // transition replaced by a rapid toggle; the controller's fallback bounds it.
-    if (event.target === event.currentTarget && event.nativeEvent.propertyName === "width") {
-      onAnimationEnd();
-    }
-  };
-
   return (
     <Box
       id={id}
       inert={!open}
       aria-hidden={!open}
-      onTransitionEnd={endWidthAnimation}
       sx={(theme) => {
         const { duration, easing } = theme.transitions;
         return {
@@ -192,7 +180,7 @@ export function ResizablePanel({
           visibility: open ? "visible" : "hidden",
           // Visibility flips immediately on open and after the width animation on close.
           transition:
-            !animate || resizing
+            !animate || !widthTransitionEnabled || resizing
               ? "none"
               : `width ${duration.shorter}ms ${easing.easeInOut}, visibility 0ms linear ${open ? 0 : duration.shorter}ms`,
           "@media (prefers-reduced-motion: reduce)": { transition: "none" },

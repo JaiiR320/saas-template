@@ -12,7 +12,7 @@ type PageTitleRowProps = {
   clearLeftToggle: boolean;
   /** Set when the row reaches the window's right edge, under the right panel toggle. */
   clearRightToggle: boolean;
-  /** Set while a panel toggle animates, so the padding slides with the panel. */
+  /** Allow padding transitions alongside panel toggles, except during navigation. */
   animate: boolean;
 };
 

@@ -4,14 +4,14 @@ import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { Header } from "./frame/Header";
 import { PageTitleRow } from "./frame/PageTitleRow";
 import { PanelToggleButton } from "./panels/PanelToggleButton";
 import { SideBar } from "./frame/SideBar";
 import { SidePanelSlot } from "./panels/SidePanelSlot";
 import type { WorkspacePages } from "./types";
-import { useSidePanel } from "./panels/useSidePanel";
+import { useTransitionEnabled } from "./motion/useTransitionEnabled";
 import { theme } from "./theme";
 
 export type WorkspaceProps = {
@@ -54,20 +54,23 @@ export function Workspace({
   sideBarFooter,
 }: WorkspaceProps) {
   const page = pages.find((candidate) => candidate.id === pageId) ?? pages[0];
-  const left = useSidePanel(page.id);
-  const right = useSidePanel(page.id);
+  const [leftOpen, setLeftOpen] = useState(true);
+  const [rightOpen, setRightOpen] = useState(true);
+  const toggleLeft = () => setLeftOpen((value) => !value);
+  const toggleRight = () => setRightOpen((value) => !value);
+  const transitionEnabled = useTransitionEnabled(page.id);
   const { center, left: leftPanel, right: rightPanel } = page.panels;
   const Center = center.content;
   const Title = center.title;
 
-  useHotkey({ key: "B", ctrl: true }, left.toggle, {
+  useHotkey({ key: "B", ctrl: true }, toggleLeft, {
     enabled: leftPanel !== undefined,
     ignoreInputs: true,
     requireReset: true,
     preventDefault: true,
     stopPropagation: true,
   });
-  useHotkey({ key: "B", ctrl: true, alt: true }, right.toggle, {
+  useHotkey({ key: "B", ctrl: true, alt: true }, toggleRight, {
     enabled: rightPanel !== undefined,
     ignoreInputs: true,
     requireReset: true,
@@ -86,8 +89,8 @@ export function Workspace({
             leftPanel && (
               <PanelToggleButton
                 side="left"
-                open={left.open}
-                onToggle={left.toggle}
+                open={leftOpen}
+                onToggle={toggleLeft}
                 tooltipPlacement="bottom"
               />
             )
@@ -96,8 +99,8 @@ export function Workspace({
             rightPanel && (
               <PanelToggleButton
                 side="right"
-                open={right.open}
-                onToggle={right.toggle}
+                open={rightOpen}
+                onToggle={toggleRight}
                 tooltipPlacement="bottom"
               />
             )
@@ -111,20 +114,25 @@ export function Workspace({
           prefetch={prefetch}
           footer={sideBarFooter}
         />
-        <SidePanelSlot side="left" panel={leftPanel} state={left} />
+        <SidePanelSlot side="left" panel={leftPanel} open={leftOpen} animate={transitionEnabled} />
         <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
           <PageTitleRow
             label={page.label}
             title={Title && <Title />}
-            clearLeftToggle={leftPanel !== undefined && !left.open}
-            clearRightToggle={rightPanel !== undefined && !right.open}
-            animate={left.animating || right.animating}
+            clearLeftToggle={leftPanel !== undefined && !leftOpen}
+            clearRightToggle={rightPanel !== undefined && !rightOpen}
+            animate={transitionEnabled}
           />
           <Box component="main" sx={{ flexGrow: 1, minHeight: 0, overflow: "auto", p: 1 }}>
             <Center />
           </Box>
         </Box>
-        <SidePanelSlot side="right" panel={rightPanel} state={right} />
+        <SidePanelSlot
+          side="right"
+          panel={rightPanel}
+          open={rightOpen}
+          animate={transitionEnabled}
+        />
       </Box>
     </ThemeProvider>
   );

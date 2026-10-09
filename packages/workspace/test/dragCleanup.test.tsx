@@ -68,24 +68,38 @@ function pointer(handle: HTMLElement, type: string, clientX = 240, pointerId = 1
 it.each(["pointerup", "pointercancel", "lostpointercapture", "blur", "unmount"])(
   "restores body inline values and priority after %s and cancels queued resizing",
   (ending) => {
-    const { handle, release } = setup();
-    document.body.style.setProperty("cursor", "crosshair", "important");
-    document.body.style.setProperty("user-select", "text", "important");
     const frames = new Map<number, FrameRequestCallback>();
+    let nextFrame = 16;
     vi.stubGlobal(
       "requestAnimationFrame",
       vi.fn((callback: FrameRequestCallback) => {
-        frames.set(17, callback);
-        return 17;
+        const id = ++nextFrame;
+        frames.set(id, callback);
+        return id;
       }),
     );
     const cancel = vi.fn((id: number) => frames.delete(id));
     vi.stubGlobal("cancelAnimationFrame", cancel);
+    const paintFrame = () =>
+      act(() => {
+        // Snapshot the queue: callbacks can schedule work for the next frame.
+        const pending = [...frames];
+        for (const [id, callback] of pending) {
+          frames.delete(id);
+          callback(0);
+        }
+      });
+    const { handle, release } = setup();
+    paintFrame();
+    paintFrame();
+    document.body.style.setProperty("cursor", "crosshair", "important");
+    document.body.style.setProperty("user-select", "text", "important");
 
     pointer(handle, "pointerdown");
     expect(document.body.style.cursor).toBe("col-resize");
     expect(document.body.style.userSelect).toBe("none");
     pointer(handle, "pointermove", 320);
+    const dragFrame = nextFrame;
     expect(handle.getAttribute("aria-valuenow")).toBe("240");
 
     if (ending === "unmount") {
@@ -95,7 +109,10 @@ it.each(["pointerup", "pointercancel", "lostpointercapture", "blur", "unmount"])
       act(() => window.dispatchEvent(new Event("blur")));
     } else pointer(handle, ending, 300);
 
-    expect(cancel).toHaveBeenCalledWith(17);
+    expect(cancel).toHaveBeenCalledWith(dragFrame);
+    expect(frames.has(dragFrame)).toBe(false);
+    paintFrame();
+    paintFrame();
     expect(frames.size).toBe(0);
     expect(release).toHaveBeenCalledTimes(1);
     expect(document.body.style.getPropertyValue("cursor")).toBe("crosshair");

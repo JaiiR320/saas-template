@@ -56,6 +56,8 @@ Content and title components receive no props. See [Pages and panels](02-guides/
 
 ## Side panel behavior
 
+CSS transitions are enabled after the initial layout has painted. Navigation and size changes suppress transitions until the reset layout has painted, so page swaps and resizing remain instant. A toggle during that brief suppression also applies instantly. Transition completion and interruption do not control panel state.
+
 | Side  | Default width | Minimum | Maximum |
 | ----- | ------------- | ------- | ------- |
 | Left  | 240 px        | 180 px  | 480 px  |

@@ -11,8 +11,8 @@ export const TOGGLE_CLEARANCE = 6.5;
 
 /**
  * The top row of each column. The rows line up so their bottom borders form one line.
- * Set `animate` while a panel toggle animates, so content slides clear of the header's
- * toggles with the panel; otherwise the padding changes instantly, as on page changes.
+ * Enable transitions so content slides clear of the header's toggles with the panel;
+ * suppress them for navigation so destination padding is applied instantly.
  */
 export function titleRowSx({ clearLeft = false, clearRight = false, animate = false } = {}) {
   return {
