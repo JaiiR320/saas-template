@@ -4,13 +4,14 @@ A full-window app frame for React. The workspace draws a side bar of pages, resi
 
 ```tsx
 import { Workspace, type WorkspacePages } from "@saas-template/workspace";
-import HomeOutlined from "@mui/icons-material/HomeOutlined";
+import { Home } from "lucide-react";
+import "@saas-template/workspace/styles.css";
 
 const pages: WorkspacePages = [
   {
     id: "home",
     label: "Home",
-    icon: <HomeOutlined />,
+    icon: <Home />,
     panels: { center: { content: () => <p>Hello</p> } },
   },
 ];
@@ -20,7 +21,7 @@ export function App() {
 }
 ```
 
-The package is private to this repository and is consumed from source. It needs React 19.2 or newer, MUI 7, and Emotion in the app that renders it.
+The package is private to this repository and is consumed from source. It needs React 19.2 or newer. Import `@saas-template/workspace/styles.css` once in the app entry and configure Tailwind v4 with `@tailwindcss/vite` for Vite apps. The frame uses local shadcn-style Button and Tooltip components backed by Radix, with Lucide icons. See [Getting started](docs/01-gettingStarted.md) for setup.
 
 ## Documentation
 

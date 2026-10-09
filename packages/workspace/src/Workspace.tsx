@@ -1,8 +1,6 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import type { ReactNode } from "react";
 import { Header } from "./frame/Header";
@@ -12,7 +10,6 @@ import { SideBar } from "./frame/SideBar";
 import { SidePanelSlot } from "./panels/SidePanelSlot";
 import type { WorkspacePages } from "./types";
 import { useSidePanel } from "./panels/useSidePanel";
-import { theme } from "./theme";
 
 export type WorkspaceProps = {
   /** The pages to show, in side bar order. */
@@ -77,11 +74,10 @@ export function Workspace({
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <TooltipProvider>
       {/* Every column runs the full window height with the header floating over their tops.
           Closed panels' resize handles must not cause scrolling. */}
-      <Box sx={{ position: "relative", display: "flex", height: "100dvh", overflow: "hidden" }}>
+      <div className="relative flex h-dvh overflow-hidden bg-background text-foreground">
         <Header
           leftToggle={
             leftPanel && (
@@ -113,7 +109,7 @@ export function Workspace({
           footer={sideBarFooter}
         />
         <SidePanelSlot side="left" panel={leftPanel} state={left} />
-        <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minWidth: 0 }}>
+        <div className="flex min-w-0 flex-1 flex-col">
           <PageTitleRow
             label={page.label}
             title={Title && <Title />}
@@ -121,12 +117,12 @@ export function Workspace({
             clearRightToggle={rightPanel !== undefined && !right.open}
             animate={left.animating || right.animating}
           />
-          <Box component="main" sx={{ flexGrow: 1, minHeight: 0, overflow: "auto", p: 1 }}>
+          <main className="min-h-0 flex-1 overflow-auto p-2">
             <Center />
-          </Box>
-        </Box>
+          </main>
+        </div>
         <SidePanelSlot side="right" panel={rightPanel} state={right} />
-      </Box>
-    </ThemeProvider>
+      </div>
+    </TooltipProvider>
   );
 }

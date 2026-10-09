@@ -14,15 +14,13 @@
     "format:check": "oxfmt . --check"
   },
   "dependencies": {
-    "@emotion/react": "catalog:",
-    "@emotion/styled": "catalog:",
-    "@mui/icons-material": "catalog:",
-    "@mui/material": "catalog:",
     "@saas-template/workspace": "workspace:*",
+    "lucide-react": "^0.468.0",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",

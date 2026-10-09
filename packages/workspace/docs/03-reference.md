@@ -9,12 +9,13 @@
 | [`WorkspacePage`](#workspacepage)                        | Type      | One page definition.                                       |
 | [`WorkspacePages`](#workspacepages)                      | Type      | A non-empty list of pages.                                 |
 | [`CenterPanel`, `SidePanel`](#centerpanel-and-sidepanel) | Types     | Panel definitions within a page.                           |
-| [`theme`](02-guides/styling.md#the-theme)                | MUI theme | The theme `Workspace` applies.                             |
 | [`textBoxTrim`](02-guides/styling.md#text-trimming)      | Style     | `{ textBox: "trim-both cap alphabetic" }` for custom text. |
+
+The CSS entry is `@saas-template/workspace/styles.css`. Import it once in the app entry. Colors use standard shadcn CSS variables, with dark values under `.dark`. There is no JavaScript `theme` export.
 
 ## `Workspace`
 
-Renders the side bar, the current page's panels, and the header with the panel toggles. It fills the window (`100dvh`), applies the workspace theme and MUI's `CssBaseline`, and is a client component.
+Renders the side bar, the current page's panels, and the header with the panel toggles. It fills the window (`100dvh`), is a client component, and uses the stylesheet imported by the app.
 
 | Prop            | Type                         | Default                | Description                                                                 |
 | --------------- | ---------------------------- | ---------------------- | --------------------------------------------------------------------------- |

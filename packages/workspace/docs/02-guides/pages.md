@@ -7,10 +7,13 @@ A page is a `WorkspacePage` definition. It names the page, gives it a side bar i
 Every page has a center panel. Add a left panel for navigation within the page, such as a list of saved items, and a right panel for a tool that works alongside the page, such as an assistant.
 
 ```tsx
+import { ChartColumn } from "lucide-react";
+import type { WorkspacePage } from "@saas-template/workspace";
+
 const reportsPage: WorkspacePage = {
   id: "reports",
   label: "Reports",
-  icon: <AssessmentOutlined />,
+  icon: <ChartColumn />,
   panels: {
     left: { title: "Saved reports", content: ReportList },
     center: { title: OpenReportName, content: ReportView },
@@ -28,18 +31,14 @@ Side panels have fixed size limits. The left panel opens at 240 pixels and resiz
 
 Panel content components take no props. They read what they need from the app's stores, context, or router hooks, the same way any component in the app would.
 
-Render text through MUI `Typography`. The workspace theme trims `Typography` text so it centers correctly; [Styling and text](styling.md) explains why.
+Render panel content with HTML elements and Tailwind classes. Use `text-muted-foreground` for secondary text and the exported `textBoxTrim` style where trimming helps alignment. [Styling and text](styling.md) covers both.
 
 The center panel supplies scrolling and 8 pixels of padding. Side-panel content supplies its own scrolling and padding. For a side panel with a long list, use a container that can shrink inside the frame:
 
 ```tsx
-import Box from "@mui/material/Box";
-
 function ProjectList() {
   return (
-    <Box sx={{ flexGrow: 1, minHeight: 0, overflow: "auto", p: 1.5 }}>
-      {/* Render the project list here. */}
-    </Box>
+    <div className="min-h-0 flex-1 overflow-auto p-3">{/* Render the project list here. */}</div>
   );
 }
 ```

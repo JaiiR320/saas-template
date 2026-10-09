@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -15,12 +16,15 @@
     "format:check": "oxfmt . --check"
   },
   "dependencies": {
-    "@tanstack/react-hotkeys": "^0.13.0"
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tanstack/react-hotkeys": "^0.13.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
-    "@emotion/react": "catalog:",
-    "@emotion/styled": "catalog:",
-    "@mui/material": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "jsdom": "catalog:",
@@ -32,9 +36,6 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@emotion/react": "^11.0.0",
-    "@emotion/styled": "^11.0.0",
-    "@mui/material": "^7.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   }

@@ -10,17 +10,40 @@ Add the workspace and its peer dependencies to the app. Inside this repository, 
 {
   "dependencies": {
     "@saas-template/workspace": "workspace:*",
-    "@emotion/react": "catalog:",
-    "@emotion/styled": "catalog:",
-    "@mui/icons-material": "catalog:",
-    "@mui/material": "catalog:",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "tailwindcss": "catalog:"
   }
 }
 ```
 
-The workspace exports TypeScript source, so the app's bundler compiles it. Vite does this without configuration. In Next.js, add `@saas-template/workspace` to `transpilePackages`.
+The workspace exports TypeScript source, so the app's bundler compiles it. In Next.js, add `@saas-template/workspace` to `transpilePackages` and use Tailwind v4's PostCSS integration.
+
+For Vite, add the Tailwind plugin alongside React:
+
+```ts
+// vite.config.ts
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});
+```
+
+Import the workspace stylesheet once in the app entry. It includes Tailwind, the frame styles, and shared color tokens:
+
+```tsx
+// src/main.tsx
+import "@saas-template/workspace/styles.css";
+```
+
+The workspace uses local shadcn-style Button and Tooltip components backed by Radix. It does not require a theme provider.
 
 ## Render a first page
 
@@ -28,7 +51,7 @@ A page has an ID, a side bar label and icon, and its panels. Only the center pan
 
 ```tsx
 // src/pages.tsx
-import FolderOutlined from "@mui/icons-material/FolderOutlined";
+import { Folder } from "lucide-react";
 import type { WorkspacePages } from "@saas-template/workspace";
 
 function ProjectsView() {
@@ -39,7 +62,7 @@ export const pages: WorkspacePages = [
   {
     id: "projects",
     label: "Projects",
-    icon: <FolderOutlined />,
+    icon: <Folder />,
     panels: {
       center: { content: ProjectsView },
     },
@@ -88,7 +111,7 @@ Each side panel now has a collapse toggle in the header, and dragging its edge r
 Add a settings page to the bottom of the side bar. It has only a center panel, so the workspace hides both side panels and their toggles while it is shown.
 
 ```tsx
-import SettingsOutlined from "@mui/icons-material/SettingsOutlined";
+import { Settings } from "lucide-react";
 
 function SettingsView() {
   return <p>Settings</p>;
@@ -98,7 +121,7 @@ export const pages: WorkspacePages = [
   {
     id: "projects",
     label: "Projects",
-    icon: <FolderOutlined />,
+    icon: <Folder />,
     panels: {
       left: { title: "All projects", content: ProjectList },
       center: { title: () => "Untitled project", content: ProjectsView },
@@ -108,7 +131,7 @@ export const pages: WorkspacePages = [
   {
     id: "settings",
     label: "Settings",
-    icon: <SettingsOutlined />,
+    icon: <Settings />,
     placement: "bottom",
     panels: { center: { content: SettingsView } },
   },

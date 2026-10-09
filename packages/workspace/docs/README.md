@@ -8,7 +8,7 @@ Start with the tutorial, then use the guides for specific tasks.
 
 - [Pages and panels](02-guides/pages.md): define pages, choose their panels, and share state between panels.
 - [Routing](02-guides/routing.md): connect Next.js, TanStack Router, or plain browser history.
-- [Styling and text](02-guides/styling.md): the theme, icon colors, and text trimming.
+- [Styling and text](02-guides/styling.md): stylesheet setup, color tokens, dark mode, and text trimming.
 
 ## Reference
 

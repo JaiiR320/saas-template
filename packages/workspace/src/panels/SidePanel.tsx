@@ -1,32 +1,20 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import { useId, type ReactNode } from "react";
-import { titleRowSx } from "../frame/layout";
+import { titleRowClassName, titleRowStyle } from "../frame/layout";
 
-type SidePanelProps = {
-  title: string;
-  /** Which header toggle the title row sits under: the left one for the left panel, and so on. */
-  side: "left" | "right";
-  children: ReactNode;
-};
-
-/** A side panel's contents: its title row and a scrolling body supplied by the page. */
+type SidePanelProps = { title: string; side: "left" | "right"; children: ReactNode };
 export function SidePanel({ title, side, children }: SidePanelProps) {
   const titleId = useId();
   return (
-    <Box
-      component="aside"
-      aria-labelledby={titleId}
-      sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}
-    >
-      <Box sx={titleRowSx({ clearLeft: side === "left", clearRight: side === "right" })}>
-        <Typography id={titleId} variant="subtitle2" component="h2" noWrap>
+    <aside aria-labelledby={titleId} className="flex min-h-0 flex-1 flex-col">
+      <div
+        className={titleRowClassName}
+        style={titleRowStyle({ clearLeft: side === "left", clearRight: side === "right" })}
+      >
+        <h2 id={titleId} className="truncate font-medium">
           {title}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, minHeight: 0 }}>
-        {children}
-      </Box>
-    </Box>
+        </h2>
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+    </aside>
   );
 }

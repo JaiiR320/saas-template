@@ -1,4 +1,3 @@
-import Box from "@mui/material/Box";
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -162,52 +161,35 @@ export function ResizablePanel({
   };
 
   return (
-    <Box
+    <div
       id={id}
       inert={!open}
       aria-hidden={!open}
       onTransitionEnd={endWidthAnimation}
       onTransitionCancel={endWidthAnimation}
-      sx={(theme) => {
-        const { duration, easing } = theme.transitions;
-        return {
-          position: "relative",
-          flexShrink: 0,
-          width: open ? panelWidth : 0,
-          visibility: open ? "visible" : "hidden",
-          // Visibility flips immediately on open and after the width animation on close.
-          transition:
-            !animate || resizing
-              ? "none"
-              : `width ${duration.shorter}ms ${easing.easeInOut}, visibility 0ms linear ${open ? 0 : duration.shorter}ms`,
-          "@media (prefers-reduced-motion: reduce)": { transition: "none" },
-        };
+      className="relative shrink-0 motion-reduce:transition-none!"
+      style={{
+        width: open ? panelWidth : 0,
+        visibility: open ? "visible" : "hidden",
+        // Visibility flips immediately on open and after the width animation on close.
+        transition:
+          !animate || resizing
+            ? "none"
+            : `width 200ms cubic-bezier(0.4, 0, 0.2, 1), visibility 0ms linear ${open ? 0 : 200}ms`,
       }}
     >
       {/* Clips the full-width contents while the panel animates, so they slide instead of reflowing. */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: side === "left" ? "flex-end" : "flex-start",
-          height: "100%",
-          overflow: "hidden",
-        }}
+      <div
+        className={`flex h-full overflow-hidden ${side === "left" ? "justify-end" : "justify-start"}`}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            flexShrink: 0,
-            width: panelWidth,
-            minHeight: 0,
-            [side === "left" ? "borderRight" : "borderLeft"]: 1,
-            borderColor: "divider",
-          }}
+        <div
+          className={`flex min-h-0 shrink-0 flex-col border-border ${side === "left" ? "border-r" : "border-l"}`}
+          style={{ width: panelWidth }}
         >
           {children}
-        </Box>
-      </Box>
-      <Box
+        </div>
+      </div>
+      <div
         role="separator"
         aria-orientation="vertical"
         aria-label={resizeLabel}
@@ -223,30 +205,9 @@ export function ResizablePanel({
         onLostPointerCapture={stopDrag}
         onDoubleClick={() => setWidth(defaultWidth)}
         onKeyDown={onKeyDown}
-        sx={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          // An 8px hit area centered on the panel border.
-          [side === "left" ? "right" : "left"]: -4,
-          width: 8,
-          zIndex: 1,
-          cursor: "col-resize",
-          touchAction: "none",
-          outline: "none",
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 3,
-            width: 2,
-            transition: "background-color 150ms",
-          },
-          "&:hover::after, &:focus-visible::after": { bgcolor: "divider" },
-          "&:active::after": { bgcolor: "primary.main" },
-        }}
+        // An 8px hit area centered on the panel border.
+        className={`absolute inset-y-0 z-1 w-2 cursor-col-resize touch-none outline-none after:absolute after:inset-y-0 after:left-[3px] after:w-0.5 after:transition-colors after:duration-150 hover:after:bg-border focus-visible:after:bg-border active:after:bg-primary ${side === "left" ? "-right-1" : "-left-1"}`}
       />
-    </Box>
+    </div>
   );
 }

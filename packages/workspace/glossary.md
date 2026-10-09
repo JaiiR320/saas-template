@@ -6,7 +6,7 @@ Terms for `@saas-template/workspace`, a generic app frame: its layout, its page 
 
 ### Workspace
 
-The `Workspace` component exported from `@saas-template/workspace`: a template that draws the frame and the current page, plus the page types, theme, and `textBoxTrim` style. It has no router, storage, domain code, or Next.js imports. It can host apps with their own routing and domain logic.
+The `Workspace` component exported from `@saas-template/workspace`: a template that draws the frame and the current page, plus the page types and `textBoxTrim` style. The separate `@saas-template/workspace/styles.css` entry supplies Tailwind v4 styles and shadcn color tokens. It has no router, storage, domain code, or Next.js imports. It can host apps with their own routing and domain logic.
 
 ### Shell
 
@@ -34,7 +34,7 @@ The top row of each panel, under the header: a side panel's title or the center 
 
 ### Text trimming
 
-The workspace theme trims `Typography` and tooltip text to its cap height and baseline with the CSS `text-box: trim-both cap alphabetic` property. A font's built-in space above and below its letters is uneven, so untrimmed text sits slightly high in whatever centers it. Render panel text through `Typography` to use the theme's typography and trimming. Frame title rows use an untrimmed 20-pixel line box for titles and breadcrumbs so they align across browsers. For other elements, spread the exported `textBoxTrim` style.
+The exported `textBoxTrim` style trims text to its cap height and baseline with the CSS `text-box: trim-both cap alphabetic` property. A font's built-in space above and below its letters is uneven, so untrimmed text sits slightly high in whatever centers it. Apply the style directly to text elements that need trimming. Frame title rows use an untrimmed 20-pixel line box for titles and breadcrumbs so they align across browsers.
 
 `text-box` applies only to the element that directly contains the text, and only when that element is a block or inline box; a flex container ignores it, and it is not inherited. Trimming also removes the line-height space that some components rely on for their height, so components sized by their text, such as tooltips, add padding back.
 

@@ -39,7 +39,7 @@ export function WorkspaceShell() {
 }
 ```
 
-Render `<WorkspaceShell />` from `app/(workspace)/layout.tsx`. Give each page a route so its URL resolves, such as `app/(workspace)/[page]/page.tsx` returning `null`. Wrap the app in MUI's `AppRouterCacheProvider` as for any MUI app, and add `@saas-template/workspace` to `transpilePackages`.
+Render `<WorkspaceShell />` from `app/(workspace)/layout.tsx`. Give each page a route so its URL resolves, such as `app/(workspace)/[page]/page.tsx` returning `null`. Import `@saas-template/workspace/styles.css` once in the root layout, configure Tailwind v4's PostCSS integration, and add `@saas-template/workspace` to `transpilePackages`.
 
 ## TanStack Router
 

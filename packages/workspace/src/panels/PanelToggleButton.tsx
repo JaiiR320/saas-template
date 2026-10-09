@@ -1,6 +1,5 @@
-import IconButton from "@mui/material/IconButton";
-import SvgIcon from "@mui/material/SvgIcon";
-import Tooltip from "@mui/material/Tooltip";
+import { Button } from "../components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../components/ui/tooltip";
 
 type Side = "left" | "right";
 
@@ -21,16 +20,21 @@ export function PanelToggleButton({
   const label = `${open ? "Hide" : "Show"} ${side} panel`;
   const shortcut = side === "left" ? "Ctrl+B" : "Ctrl+Alt+B";
   return (
-    <Tooltip title={`${label} (${shortcut})`} placement={tooltipPlacement}>
-      <IconButton
-        aria-label={label}
-        aria-expanded={open}
-        aria-controls={`${side}-panel`}
-        aria-keyshortcuts={side === "left" ? "Control+b" : "Control+Alt+b"}
-        onClick={onToggle}
-      >
-        <PanelToggleIcon side={side} open={open} />
-      </IconButton>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={label}
+          aria-expanded={open}
+          aria-controls={`${side}-panel`}
+          aria-keyshortcuts={side === "left" ? "Control+b" : "Control+Alt+b"}
+          onClick={onToggle}
+        >
+          <PanelToggleIcon side={side} open={open} />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side={tooltipPlacement}>{`${label} (${shortcut})`}</TooltipContent>
     </Tooltip>
   );
 }
@@ -39,14 +43,14 @@ export function PanelToggleButton({
 function PanelToggleIcon({ side, open }: { side: Side; open: boolean }) {
   const pointsLeft = side === "left" ? open : !open;
   return (
-    <SvgIcon
-      sx={{
-        fill: "none",
-        stroke: "currentColor",
-        strokeWidth: 2,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-      }}
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <rect x="3" y="3" width="18" height="18" rx="2" />
       <path d={side === "left" ? "M9 3v18" : "M15 3v18"} />
@@ -61,6 +65,6 @@ function PanelToggleIcon({ side, open }: { side: Side; open: boolean }) {
               : "m8 9 3 3-3 3"
         }
       />
-    </SvgIcon>
+    </svg>
   );
 }
