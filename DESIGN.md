@@ -57,6 +57,8 @@ Reuse Button variants for primary, outlined, and ghost actions. Use ghost icon c
 
 Use real links for navigation and buttons for actions. Preserve modified clicks and native browser behavior. A tooltip supplements an accessible name; it does not replace one.
 
+Button tooltips appear after 700ms of hover. After a tooltip closes, neighboring tooltips appear immediately within a 300ms window so users can explore related controls.
+
 Use landmarks, descriptive headings, labels, and native controls. Keep keyboard navigation usable and never communicate state through color alone. Collapsed panels remain inert and hidden from assistive technology while preserving their mounted content state.
 
 ## Motion

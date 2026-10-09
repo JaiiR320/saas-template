@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn } from "../../lib/utils";
 
 export function TooltipProvider(props: ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return <TooltipPrimitive.Provider delayDuration={300} {...props} />;
+  return <TooltipPrimitive.Provider delayDuration={700} skipDelayDuration={300} {...props} />;
 }
 export const Tooltip = TooltipPrimitive.Root;
 export const TooltipTrigger = TooltipPrimitive.Trigger;
