@@ -38,6 +38,7 @@ type Drag = {
   startWidth: number;
   pendingX: number;
   frame: number | null;
+  bodyStyles: { property: string; value: string; priority: string }[];
 };
 
 const KEYBOARD_STEP = 16;
@@ -51,8 +52,10 @@ function endDrag(drag: RefObject<Drag | null>) {
   if (active.target.hasPointerCapture(active.pointerId)) {
     active.target.releasePointerCapture(active.pointerId);
   }
-  document.body.style.removeProperty("cursor");
-  document.body.style.removeProperty("user-select");
+  for (const { property, value, priority } of active.bodyStyles) {
+    if (value) document.body.style.setProperty(property, value, priority);
+    else document.body.style.removeProperty(property);
+  }
 }
 
 /**
@@ -116,6 +119,11 @@ export function ResizablePanel({
       startWidth: width,
       pendingX: event.clientX,
       frame: null,
+      bodyStyles: ["cursor", "user-select"].map((property) => ({
+        property,
+        value: document.body.style.getPropertyValue(property),
+        priority: document.body.style.getPropertyPriority(property),
+      })),
     };
     // Keep the resize cursor and prevent text selection while the pointer leaves the handle.
     document.body.style.cursor = "col-resize";
@@ -141,6 +149,10 @@ export function ResizablePanel({
     active.pendingX = event.clientX;
     applyPendingWidth();
     stopDrag();
+  };
+
+  const onPointerInterrupted = (event: PointerEvent<HTMLElement>) => {
+    if (drag.current?.pointerId === event.pointerId) stopDrag();
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -222,8 +234,8 @@ export function ResizablePanel({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={stopDrag}
-        onLostPointerCapture={stopDrag}
+        onPointerCancel={onPointerInterrupted}
+        onLostPointerCapture={onPointerInterrupted}
         onDoubleClick={() => setWidth(defaultWidth)}
         onKeyDown={onKeyDown}
         sx={{
