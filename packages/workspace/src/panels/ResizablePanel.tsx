@@ -158,7 +158,11 @@ export function ResizablePanel({
 
   // Ignore transitions from the contents and the handle, and the visibility transition.
   const endWidthAnimation = (event: TransitionEvent<HTMLElement>) => {
-    if (event.target === event.currentTarget && event.propertyName === "width") onAnimationEnd();
+    // Only completion settles the request. Cancellation may belong to an older
+    // transition replaced by a rapid toggle; the controller's fallback bounds it.
+    if (event.target === event.currentTarget && event.nativeEvent.propertyName === "width") {
+      onAnimationEnd();
+    }
   };
 
   return (
@@ -167,7 +171,6 @@ export function ResizablePanel({
       inert={!open}
       aria-hidden={!open}
       onTransitionEnd={endWidthAnimation}
-      onTransitionCancel={endWidthAnimation}
       sx={(theme) => {
         const { duration, easing } = theme.transitions;
         return {

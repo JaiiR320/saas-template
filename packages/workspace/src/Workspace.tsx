@@ -53,10 +53,9 @@ export function Workspace({
   prefetch,
   sideBarFooter,
 }: WorkspaceProps) {
-  const left = useSidePanel("left");
-  const right = useSidePanel("right");
-
   const page = pages.find((candidate) => candidate.id === pageId) ?? pages[0];
+  const left = useSidePanel("left", page.id);
+  const right = useSidePanel("right", page.id);
   const { center, left: leftPanel, right: rightPanel } = page.panels;
   const Center = center.content;
   const Title = center.title;
