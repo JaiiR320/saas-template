@@ -43,35 +43,32 @@ Render `<WorkspaceShell />` from `app/(workspace)/layout.tsx`. Give each page a 
 
 ## TanStack Router
 
-Read the page from a route param and pass the router's `navigate` and `preloadRoute`:
+The template app uses code-based routes in `apps/web/src/router.tsx`. It exports a `router` singleton and `createAppRouter(history?)`, which accepts a custom history for tests. The root route renders a shared `WorkspaceShell`, so the workspace stays mounted when the URL changes and keeps its panel state.
+
+The route tree includes `/`, `/$page`, and a required `$detail` segment with a nested `$` catchall. The index shows the first page. The page param selects a workspace page, and unknown IDs fall back to the first page. The catchall accepts deeper paths such as `/projects/42` without rewriting the URL.
+
+In the shell, read the page param and adapt the workspace's URL callbacks to TanStack Router's typed destination and params:
 
 ```tsx
-// src/routes/$page.tsx
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Workspace } from "@saas-template/workspace";
-import { pages } from "../pages";
+const pageFromHref = (href: string) => decodeURIComponent(href.slice(1));
 
-export const Route = createFileRoute("/$page")({ component: WorkspaceRoute });
-
-function WorkspaceRoute() {
-  const router = useRouter();
-  const { page } = Route.useParams();
-  return (
-    <Workspace
-      pages={pages}
-      pageId={page}
-      navigate={(href) => router.navigate({ to: href })}
-      prefetch={(href) => router.preloadRoute({ to: href })}
-    />
-  );
-}
+<Workspace
+  pages={pages}
+  pageId={page}
+  navigate={(href) => {
+    void router.navigate({ to: "/$page", params: { page: pageFromHref(href) } });
+  }}
+  prefetch={(href) => {
+    void router.preloadRoute({ to: "/$page", params: { page: pageFromHref(href) } });
+  }}
+/>;
 ```
 
-TanStack Router keeps the route component mounted when only its param changes, so moving between pages keeps the workspace's panel state.
+This adapter assumes the workspace's default `/${pageId}` URLs. Adjust it alongside `getPageHref` if your app uses a prefix. The workspace package itself has no router dependency.
 
 ## Plain browser history
 
-Apps without a router can read the first path segment with `useSyncExternalStore` and navigate with `history.pushState`. [Getting started](../01-gettingStarted.md#connect-the-url) shows the complete version, which `apps/web` also uses.
+Apps without a router can read the first path segment with `useSyncExternalStore` and navigate with `history.pushState`. [Getting started](../01-gettingStarted.md#connect-the-url) shows a complete consumer example. The template app uses TanStack Router instead.
 
 ## Under a base path
 

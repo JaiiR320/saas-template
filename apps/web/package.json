@@ -11,10 +11,12 @@
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
     "format": "oxfmt .",
-    "format:check": "oxfmt . --check"
+    "format:check": "oxfmt . --check",
+    "test": "vitest run"
   },
   "dependencies": {
     "@saas-template/workspace": "workspace:*",
+    "@tanstack/react-router": "^1.170.41",
     "lucide-react": "^0.468.0",
     "react": "catalog:",
     "react-dom": "catalog:"
@@ -24,9 +26,11 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
+    "jsdom": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "typescript": "catalog:native",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

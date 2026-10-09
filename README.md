@@ -14,7 +14,7 @@ Open the URL printed by Vite. Home, Projects, and Settings demonstrate different
 ## Structure
 
 - `packages/workspace`: the generic frame, panel behavior, theme, tests, and [consumer docs](packages/workspace/docs/README.md).
-- `apps/web`: placeholder pages and browser-history routing. Start here to customize the app.
+- `apps/web`: placeholder pages and code-based TanStack Router routes in `src/router.tsx`. Start here to customize the app.
 
 The workspace package is a standalone copy. Changes here do not update the genomebrowser repository.
 
