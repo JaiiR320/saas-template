@@ -44,6 +44,7 @@ export function SideBar({
           <a
             className={cn(
               buttonVariants({ variant: "ghost", size: "icon" }),
+              "text-muted-foreground",
               current && "bg-accent text-accent-foreground",
             )}
             href={href}

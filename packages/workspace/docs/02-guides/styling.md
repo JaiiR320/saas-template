@@ -8,6 +8,10 @@ Import `@saas-template/workspace/styles.css` once in the app entry, or in the ro
 
 There is no JavaScript `theme` export or theme provider. The package's Button and Tooltip components are internal to the frame; apps can keep their own local shadcn components for page content.
 
+## Typography and visual style
+
+The theme follows [Vercel's design guidance](https://vercel.com/design.md) with self-hosted Geist Sans for text and Geist Mono for code, neutral surfaces, subtle borders, and restrained six-pixel corner radii. Use `font-sans` for interface text and `font-mono` for code or technical identifiers. Focus rings use blue so keyboard focus stays visible in both themes.
+
 ## Color tokens and dark mode
 
 The stylesheet defines standard shadcn CSS variables such as `--background`, `--foreground`, `--primary`, `--primary-foreground`, `--muted`, `--muted-foreground`, and `--border`. Tailwind maps these to utilities such as `bg-background`, `text-foreground`, and `border-border`. The current page's side bar icon uses the primary color.

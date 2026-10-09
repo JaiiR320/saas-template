@@ -3,9 +3,11 @@ import type { WorkspacePages } from "@saas-template/workspace";
 
 function HomeView() {
   return (
-    <div className="p-6">
-      <h1 className="mb-2 text-2xl font-normal">Home</h1>
-      <p className="text-muted-foreground">Your application starts here.</p>
+    <div className="flex flex-col gap-2 p-6">
+      <h1 className="text-2xl font-semibold tracking-tight">Home</h1>
+      <p className="max-w-prose text-sm leading-6 text-muted-foreground">
+        Your application starts here.
+      </p>
     </div>
   );
 }
@@ -13,7 +15,7 @@ function HomeView() {
 function NavigationPanel() {
   return (
     <div className="p-4">
-      <p className="text-muted-foreground">Navigation placeholder</p>
+      <p className="text-sm leading-6 text-muted-foreground">Navigation placeholder</p>
     </div>
   );
 }
@@ -21,16 +23,18 @@ function NavigationPanel() {
 function ActivityPanel() {
   return (
     <div className="p-4">
-      <p className="text-muted-foreground">Activity placeholder</p>
+      <p className="text-sm leading-6 text-muted-foreground">Activity placeholder</p>
     </div>
   );
 }
 
 function ProjectsView() {
   return (
-    <div className="p-6">
-      <h1 className="mb-2 text-2xl font-normal">Projects</h1>
-      <p className="text-muted-foreground">Add your project content here.</p>
+    <div className="flex flex-col gap-2 p-6">
+      <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
+      <p className="max-w-prose text-sm leading-6 text-muted-foreground">
+        Add your project content here.
+      </p>
     </div>
   );
 }
@@ -38,16 +42,18 @@ function ProjectsView() {
 function ProjectsPanel() {
   return (
     <div className="p-4">
-      <p className="text-muted-foreground">Projects placeholder</p>
+      <p className="text-sm leading-6 text-muted-foreground">Projects placeholder</p>
     </div>
   );
 }
 
 function SettingsView() {
   return (
-    <div className="p-6">
-      <h1 className="mb-2 text-2xl font-normal">Settings</h1>
-      <p className="text-muted-foreground">Add your application settings here.</p>
+    <div className="flex flex-col gap-2 p-6">
+      <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+      <p className="max-w-prose text-sm leading-6 text-muted-foreground">
+        Add your application settings here.
+      </p>
     </div>
   );
 }
