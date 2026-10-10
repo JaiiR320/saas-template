@@ -9,66 +9,40 @@ The app's router owns the URL. The workspace reads the current page from `pageId
 | `navigate`    | Client-side navigation to a URL from `getPageHref`.                             |
 | `prefetch`    | Preloads a page's URL when its link is hovered or focused.                      |
 
-Without `navigate`, links load their URL normally. Clicks with a modifier key, which open a new tab or window, always go to the browser. A plain left click on the current page's link does nothing.
+Without `navigate`, links to other pages load their URL normally. Clicks with a modifier key, which open a new tab or window, always go to the browser. A plain left click on the current page's link does nothing.
 
 Render the workspace where it stays mounted as the page changes, usually a layout. Panel widths and collapsed sides live in the workspace, so remounting it on every page change resets them.
 
-## Next.js App Router
+## Connect a router
 
-Render the workspace from a client component inside a layout, and read the page from the segment below that layout with `useSelectedLayoutSegment`. Define `pages` in a client module as well: page definitions contain components, which a Server Component cannot pass to a Client Component.
+Keep the page definitions in a module used by the app, then adapt the router's current page and navigation methods to the workspace props. This adapter is independent of a router library:
 
 ```tsx
-// app/(workspace)/WorkspaceShell.tsx
-"use client";
+import { Workspace, type WorkspacePages } from "@saas-template/workspace";
 
-import { Workspace } from "@saas-template/workspace";
-import { useRouter, useSelectedLayoutSegment } from "next/navigation";
-import { pages } from "./pages";
+type RouterState = {
+  page: string | null;
+  go: (options: { to: string }) => void;
+};
 
-export function WorkspaceShell() {
-  const router = useRouter();
-  const segment = useSelectedLayoutSegment();
+export function RouterWorkspace({ pages, router }: { pages: WorkspacePages; router: RouterState }) {
   return (
     <Workspace
       pages={pages}
-      pageId={segment ?? undefined}
-      navigate={(href) => router.push(href)}
-      prefetch={(href) => router.prefetch(href)}
+      pageId={router.page ?? undefined}
+      navigate={(href) => router.go({ to: href })}
     />
   );
 }
 ```
 
-Render `<WorkspaceShell />` from `app/(workspace)/layout.tsx`. Give each page a route so its URL resolves, such as `app/(workspace)/[page]/page.tsx` returning `null`. Import `@saas-template/workspace/styles.css` once in the root layout, configure Tailwind v4's PostCSS integration, and add `@saas-template/workspace` to `transpilePackages`.
+Pass the router's page segment as `pageId`, converting `null` to `undefined` if necessary. Wrap its navigation method in `(href) => ...` when its signature differs. Do the same for preloading, or omit `prefetch` if the router does not support it. Register routes for each generated URL, and arrange for direct requests and refreshes to resolve to the app.
 
-## TanStack Router
-
-The template app uses code-based routes in `apps/web/src/router.tsx`. It exports a `router` singleton and `createAppRouter(history?)`, which accepts a custom history for tests. The root route renders a shared `WorkspaceShell`, so the workspace stays mounted when the URL changes and keeps its panel state.
-
-The route tree includes `/`, `/$page`, and a required `$detail` segment with a nested `$` catchall. The index shows the first page. The page param selects a workspace page, and unknown IDs fall back to the first page. The catchall accepts deeper paths such as `/projects/42` without rewriting the URL.
-
-In the shell, read the page param and adapt the workspace's URL callbacks to TanStack Router's typed destination and params:
-
-```tsx
-const pageFromHref = (href: string) => decodeURIComponent(href.slice(1));
-
-<Workspace
-  pages={pages}
-  pageId={page}
-  navigate={(href) => {
-    void router.navigate({ to: "/$page", params: { page: pageFromHref(href) } });
-  }}
-  prefetch={(href) => {
-    void router.preloadRoute({ to: "/$page", params: { page: pageFromHref(href) } });
-  }}
-/>;
-```
-
-This adapter assumes the workspace's default `/${pageId}` URLs. Adjust it alongside `getPageHref` if your app uses a prefix. The workspace package itself has no router dependency.
+The workspace does not subscribe to the router. Calling `navigate` must eventually cause the app to pass the new `pageId`. In apps with server components, define the page components and their page list on the client side because these definitions contain functions.
 
 ## Plain browser history
 
-Apps without a router can read the first path segment with `useSyncExternalStore` and navigate with `history.pushState`. [Getting started](../01-gettingStarted.md#connect-the-url) shows a complete consumer example. The template app uses TanStack Router instead.
+Apps without a router can read the first path segment with `useSyncExternalStore` and navigate with `history.pushState`. [Getting started](../01-gettingStarted.md#connect-the-url) shows a browser-only version.
 
 ## Under a base path
 

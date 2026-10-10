@@ -21,7 +21,7 @@ export function App() {
 }
 ```
 
-The package is private to this repository and is consumed from source. It needs React 19.2 or newer. Import `@saas-template/workspace/styles.css` once in the app entry and configure Tailwind v4 with `@tailwindcss/vite` for Vite apps. The frame uses local shadcn-style Button and Tooltip components backed by Radix, with Lucide icons. See [Getting started](docs/01-gettingStarted.md) for setup.
+The package is private to this repository and is consumed from source. It needs React and React DOM compatible with `^19.2.0`. Import `@saas-template/workspace/styles.css` once in the app entry and configure Tailwind v4 with `@tailwindcss/vite` for Vite apps. The frame uses local shadcn-style Button and Tooltip components backed by Radix, with Lucide icons. See [Getting started](docs/01-gettingStarted.md) for setup.
 
 ## Documentation
 

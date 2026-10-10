@@ -58,7 +58,7 @@ function SettingsView() {
   );
 }
 
-export const pages: WorkspacePages = [
+export const pages = [
   {
     id: "home",
     label: "Home",
@@ -85,4 +85,4 @@ export const pages: WorkspacePages = [
     placement: "bottom",
     panels: { center: { content: SettingsView } },
   },
-];
+] as const satisfies WorkspacePages;

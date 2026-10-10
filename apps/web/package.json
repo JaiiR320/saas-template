@@ -8,11 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "lint": "oxlint .",
-    "lint:fix": "oxlint . --fix",
+    "test": "vitest run",
+    "lint": "oxlint --config ../../.oxlintrc.json --deny-warnings .",
+    "lint:fix": "oxlint --config ../../.oxlintrc.json --deny-warnings --fix .",
     "format": "oxfmt .",
-    "format:check": "oxfmt . --check",
-    "test": "vitest run"
+    "format:check": "oxfmt . --check"
   },
   "dependencies": {
     "@saas-template/workspace": "workspace:*",

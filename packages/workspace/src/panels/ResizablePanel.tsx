@@ -3,11 +3,11 @@ import {
   type PointerEvent,
   type ReactNode,
   type RefObject,
-  type TransitionEvent,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { useTransitionEnabled } from "../motion/useTransitionEnabled";
 
 type ResizablePanelProps = {
   id: string;
@@ -17,10 +17,8 @@ type ResizablePanelProps = {
   /** Owned by the caller so the width can outlive this panel, such as across page changes. */
   width: number;
   onWidthChange: (width: number) => void;
-  /** Animate the next open or close. When false, the panel opens and closes instantly. */
+  /** Allow open/close transitions. Width changes and active dragging remain instant. */
   animate: boolean;
-  /** Called when an open or close animation finishes or is interrupted. */
-  onAnimationEnd: () => void;
   /** Restored by double-clicking the handle. */
   defaultWidth: number;
   minWidth: number;
@@ -37,6 +35,7 @@ type Drag = {
   startWidth: number;
   pendingX: number;
   frame: number | null;
+  bodyStyles: { property: string; value: string; priority: string }[];
 };
 
 const KEYBOARD_STEP = 16;
@@ -50,8 +49,10 @@ function endDrag(drag: RefObject<Drag | null>) {
   if (active.target.hasPointerCapture(active.pointerId)) {
     active.target.releasePointerCapture(active.pointerId);
   }
-  document.body.style.removeProperty("cursor");
-  document.body.style.removeProperty("user-select");
+  for (const { property, value, priority } of active.bodyStyles) {
+    if (value) document.body.style.setProperty(property, value, priority);
+    else document.body.style.removeProperty(property);
+  }
 }
 
 /**
@@ -66,7 +67,6 @@ export function ResizablePanel({
   width,
   onWidthChange,
   animate,
-  onAnimationEnd,
   defaultWidth,
   minWidth,
   maxWidth,
@@ -74,6 +74,7 @@ export function ResizablePanel({
   children,
 }: ResizablePanelProps) {
   const [resizing, setResizing] = useState(false);
+  const widthTransitionEnabled = useTransitionEnabled(width);
   const drag = useRef<Drag | null>(null);
   // Dragging toward the workspace center widens the panel.
   const direction = side === "left" ? 1 : -1;
@@ -115,6 +116,11 @@ export function ResizablePanel({
       startWidth: width,
       pendingX: event.clientX,
       frame: null,
+      bodyStyles: ["cursor", "user-select"].map((property) => ({
+        property,
+        value: document.body.style.getPropertyValue(property),
+        priority: document.body.style.getPropertyPriority(property),
+      })),
     };
     // Keep the resize cursor and prevent text selection while the pointer leaves the handle.
     document.body.style.cursor = "col-resize";
@@ -142,6 +148,10 @@ export function ResizablePanel({
     stopDrag();
   };
 
+  const onPointerInterrupted = (event: PointerEvent<HTMLElement>) => {
+    if (drag.current?.pointerId === event.pointerId) stopDrag();
+  };
+
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     const keyDirection = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
     if (keyDirection !== undefined) {
@@ -155,25 +165,18 @@ export function ResizablePanel({
 
   const panelWidth = clamp(width);
 
-  // Ignore transitions from the contents and the handle, and the visibility transition.
-  const endWidthAnimation = (event: TransitionEvent<HTMLElement>) => {
-    if (event.target === event.currentTarget && event.propertyName === "width") onAnimationEnd();
-  };
-
   return (
     <div
       id={id}
       inert={!open}
       aria-hidden={!open}
-      onTransitionEnd={endWidthAnimation}
-      onTransitionCancel={endWidthAnimation}
       className="relative shrink-0 motion-reduce:transition-none!"
       style={{
         width: open ? panelWidth : 0,
         visibility: open ? "visible" : "hidden",
         // Visibility flips immediately on open and after the width animation on close.
         transition:
-          !animate || resizing
+          !animate || !widthTransitionEnabled || resizing
             ? "none"
             : `width 200ms cubic-bezier(0.4, 0, 0.2, 1), visibility 0ms linear ${open ? 0 : 200}ms`,
       }}
@@ -201,8 +204,8 @@ export function ResizablePanel({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={stopDrag}
-        onLostPointerCapture={stopDrag}
+        onPointerCancel={onPointerInterrupted}
+        onLostPointerCapture={onPointerInterrupted}
         onDoubleClick={() => setWidth(defaultWidth)}
         onKeyDown={onKeyDown}
         // An 8px hit area centered on the panel border.

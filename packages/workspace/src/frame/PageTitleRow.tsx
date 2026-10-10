@@ -6,6 +6,7 @@ type PageTitleRowProps = {
   title?: ReactNode;
   clearLeftToggle: boolean;
   clearRightToggle: boolean;
+  /** Allow padding transitions alongside panel toggles, except during navigation. */
   animate: boolean;
 };
 export function PageTitleRow({

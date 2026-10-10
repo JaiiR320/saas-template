@@ -453,7 +453,7 @@ it("renders pages a shell injects, with only the panels each page supplies", () 
   expect(container.querySelector('button[aria-controls="right-panel"]')).toBeNull();
 });
 
-it("swaps side panels instantly on page changes and animates only toggles", () => {
+it("swaps side panels instantly on page changes and animates only toggles", async () => {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
@@ -470,7 +470,12 @@ it("swaps side panels instantly on page changes and animates only toggles", () =
   expect(getComputedStyle(leftPanel).width).toBe("240px");
   expect(transition()).toBe("none");
 
-  // The toggle animates until the width transition ends.
+  // After the restored page paints, CSS can animate later user toggles.
+  await act(async () => {
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
+  });
   act(() =>
     container!.querySelector<HTMLButtonElement>('button[aria-controls="left-panel"]')!.click(),
   );
@@ -480,7 +485,7 @@ it("swaps side panels instantly on page changes and animates only toggles", () =
     Object.assign(event, { propertyName: "width" });
     leftPanel.dispatchEvent(event);
   });
-  expect(transition()).toBe("none");
+  expect(transition()).toContain("width");
 });
 
 it("keeps a shared side panel's state across pages that supply it", () => {

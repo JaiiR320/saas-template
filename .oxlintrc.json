@@ -1,0 +1,27 @@
+{
+  "$schema": "./apps/web/node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "typescript", "oxc", "react", "jsx-a11y"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error"
+  },
+  "ignorePatterns": ["**/node_modules/**", "**/dist/**"],
+  "overrides": [
+    {
+      "files": ["**/test/**/*.{ts,tsx}", "**/*.{test,spec}.{ts,tsx}"],
+      "plugins": ["unicorn", "typescript", "oxc", "react", "jsx-a11y", "vitest"],
+      "rules": {
+        "vitest/no-focused-tests": "error"
+      }
+    },
+    {
+      "files": ["packages/workspace/src/panels/ResizablePanel.tsx"],
+      "rules": {
+        "jsx-a11y/prefer-tag-over-role": "off"
+      }
+    }
+  ]
+}

@@ -37,7 +37,7 @@ Use semantic utilities instead of literal colors in components. The stylesheet o
 | Boundaries         | `border-border`                      | `#eaeaea`            | `#292929`             |
 | Keyboard focus     | `ring-ring`                          | `#0070f3`            | `#52a8ff`             |
 
-The app shell selects dark mode by adding `.dark` to the document root. Keep theme preference and persistence in the shell. Shared controls and portaled tooltips must work in both themes.
+The app shell selects dark mode by adding `.dark` to the document root. The template app defaults to dark in `apps/web/index.html`. Keep theme preference and persistence in the shell. Shared controls and portaled tooltips must work in both themes.
 
 Reserve additional color for meaningful states or data. Pair status colors with text or an icon. Check contrast when adding or changing tokens.
 
